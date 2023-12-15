@@ -81,15 +81,13 @@ class PostingResource(Resource) :
 
         try :
             connection = get_connection()
-            query = '''select p.imgUrl, u.email, p.createdAt, fi.*
-                            from follow f
-                            join posting p
-                            on f.followeeId =p.id
-                            left join favorite fi
-                            on p.id = fi.postingId
-                            join user u 
-                            on u.id = p.userId
-                            where f.followerId = %s;'''
+            query = '''select p.id , p.imgUrl, u.email, p.createdAt
+                                    from follow f
+                                    join posting p
+                                    on f.followeeId = p.userId
+                                    join user u
+                                    on p.userId = u.id
+                                    where f.followerId = %s;'''
             
             record = (user_id, )
 
