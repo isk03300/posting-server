@@ -72,6 +72,9 @@ class PostingResource(Resource) :
 
                 tag_list.append( label['Name'] )    
 
+        # DB의 posting 테이븡레 데이터를 넣어야 하고,
+        # tag_name 테이블과 tag 테이블에도 데이터를 넣어줘야 한다.
+
         return tag_list
         
         
