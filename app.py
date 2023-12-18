@@ -2,7 +2,7 @@ from flask import Flask
 from flask_jwt_extended import JWTManager
 from flask_restful import Api
 from config import Config
-from resources.favorite import FavoriteResource
+from resources.like import LikeResource
 from resources.follow import FollowResoucre
 from resources.posting import PostingResource
 from resources.user import UserLoginResource, UserRegisterResource, userLogoutResource
@@ -30,7 +30,7 @@ api.add_resource(  UserRegisterResource , '/user/register')
 api.add_resource(UserLoginResource ,'/user/login' )
 api.add_resource(userLogoutResource , '/user/logout')
 api.add_resource(PostingResource , '/posting')
-api.add_resource( FavoriteResource , '/favorite')
+api.add_resource( LikeResource , '/like')
 api.add_resource( FollowResoucre , '/follow')
 if __name__ == '__main__' :
     app.run()

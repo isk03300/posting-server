@@ -10,7 +10,7 @@ from mysql.connector import Error
 from datetime import datetime
 import boto3
 
-class FavoriteResource(Resource) :
+class LikeResource(Resource) :
     
     @jwt_required()
     def post(self) :
@@ -21,7 +21,7 @@ class FavoriteResource(Resource) :
         try :
             connection = get_connection()
 
-            query = '''insert into favorite
+            query = '''insert into like
                                 (userId, postingId)
                                 values
                                 (%s,%s);'''
@@ -54,7 +54,7 @@ class FavoriteResource(Resource) :
             connection = get_connection()
 
             query = '''delete 
-                        from favorite
+                        from like
                         where userId = %s and postingId = %s;'''
             
             record = (user_id,postingId)

@@ -23,7 +23,7 @@ class PostingResource(Resource) :
             return {'error' : '파일을 찾을 수 없습니다.'}, 400
         
         current_tiem = datetime.now()
-        new_file_name = current_tiem.isoformat().replace(':','-') + '.jpg'
+        new_file_name = current_tiem.isoformat().replace(':','-') + 'id:' + str(user_id) + '.jpg'
         file.filename = new_file_name
 
         s3 = boto3.client( 's3', 
@@ -40,38 +40,73 @@ class PostingResource(Resource) :
             return {'error' : str(e)}, 500
         
         
+        # rekognition 서비스를 이용해서
+        # object detection 하여. 태그 이름을 가져온다.
+
+        tag_list = self.detect_labels(new_file_name,Config.S3_BUCKET)
         
-        try :
-            connection = get_connection()
+    def detect_labels(self, photo, bucket):
 
-            query = '''insert into posting
-                        (userId,imgUrl,content)
-                        values
-                        (%s,%s,%s);'''
+        client = boto3.client('rekognition',
+                     'ap-northeast-2',
+                     aws_access_key_id = Config.AWS_ACCESS_KEY_ID,
+                     aws_secret_access_key = Config.AWS_SECRET_ACCESS_KEY)
+
+        response = client.detect_labels(Image={'S3Object':{'Bucket':bucket,'Name':photo}},
+        MaxLabels=5,
+        # Uncomment to use image properties and filtration settings
+        #Features=["GENERAL_LABELS", "IMAGE_PROPERTIES"],
+        #Settings={"GeneralLabels": {"LabelInclusionFilters":["Cat"]},
+        # "ImageProperties": {"MaxDominantColors":10}}
+        )
+
+        print('Detected labels for ' + photo)
+        print()
+
+        tag_list = []
+        for label in response['Labels']:
             
-            imgUrl = Config.S3_LOCATION + file.filename
+            if label['Confidence'] >= 90:
+                print("Label: " + label['Name'])
+                print("Confidence: " + str(label['Confidence']))
+
+                tag_list.append( label['Name'] )    
+
+        return tag_list
+        
+        
+        
+        # try :
+        #     connection = get_connection()
+
+        #     query = '''insert into posting
+        #                 (userId,imgUrl,content)
+        #                 values
+        #                 (%s,%s,%s);'''
             
-            record = (user_id, imgUrl , content)
+        #     imgUrl = Config.S3_LOCATION + file.filename
+            
+        #     record = (user_id, imgUrl , content)
 
-            cursor = connection.cursor()
-            cursor.execute(query,record)
+        #     cursor = connection.cursor()
+        #     cursor.execute(query,record)
 
-            connection.commit()
+        #     connection.commit()
 
-            cursor.close()
-            connection.close()
+        #     cursor.close()
+        #     connection.close()
 
-        except Error as e :
-            print(e)
-            cursor.close()
-            connection.close()
-            return {'error' : str(e)}, 400
+        # except Error as e :
+        #     print(e)
+        #     cursor.close()
+        #     connection.close()
+        #     return {'error' : str(e)}, 400
 
 
         
 
-        return {'resul' : 'success',
-                'imgUrl' : imgUrl }, 200
+        # return {'resul' : 'success',
+        #         'imgUrl' : imgUrl }, 200
 
     @jwt_required()
     def get(self) :
