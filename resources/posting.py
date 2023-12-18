@@ -6,7 +6,6 @@ from mysql_connection import get_connection
 from mysql.connector import Error
 
 
-
 from datetime import datetime
 import boto3
 
@@ -81,14 +80,14 @@ class PostingResource(Resource) :
 
         try :
             connection = get_connection()
-            query = '''select p.id , p.imgUrl, u.email, p.createdAt
-                                    from follow f
-                                    join posting p
-                                    on f.followeeId = p.userId
-                                    join user u
-                                    on p.userId = u.id
-                                    where f.followerId = %s;'''
-            
+            query = '''select p.id, p.imgUrl, p.content, u.email, p.createdAt
+                        from follow f
+                        join posting p
+                        on f.followeeId = p.userId
+                        join user u
+                        on u.id = p.userId
+                        where f.followerId = %s;'''
+                                    
             record = (user_id, )
 
             cursor = connection.cursor(dictionary=True)
@@ -97,10 +96,13 @@ class PostingResource(Resource) :
 
             result_list = cursor.fetchall()
 
+            print(result_list)
+
             i = 0
             for row in result_list :
-                result_list[i]['createdAt'] = row['createdAt'].isoformat()
+                result_list[i]['createdAt']=row['createdAt'].isoformat()
                 i = i + 1
+
             print(result_list)
 
             cursor.close()
