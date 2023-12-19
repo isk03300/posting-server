@@ -71,3 +71,71 @@ class FollowResoucre(Resource) :
             return {'error' : str(e)}, 400
 
         return {'result' : 'success'}, 200
+    
+class FollowFmResource(Resource) :
+
+    @jwt_required()
+    def post(self,followee_id) :
+        user_id = get_jwt_identity()
+
+        try :
+            connection = get_connection()
+
+            query = '''insert into follow
+                                (followerId, followeeId)
+                                values
+                                (%s,%s);'''
+            
+            record = (user_id, followee_id)
+
+            cursor = connection.cursor()
+            cursor.execute(query,record)
+
+            connection.commit()
+
+            cursor.close()
+            connection.close()
+
+        except Error as e :
+            print(e)
+            cursor.close()
+            connection.close()
+            return {'error' : (e)} , 400
+
+        return {'result' : 'success'},200
+        
+    @jwt_required()    
+    def delete(self,followee_id) :
+        
+
+        user_id = get_jwt_identity()
+
+        try :
+            connection = get_connection()
+
+            query = '''delete 
+                        from follow
+                        where followerId = %s and followeeId = %s;'''
+            
+            record = (user_id,followee_id)
+
+            cursor = connection.cursor()
+            cursor.execute(query,record)
+
+            connection.commit()
+
+            cursor.close()
+            connection.close()
+
+
+        except Error as e:
+
+            print(e)
+            cursor.close()
+            connection.close()
+            return {'error' : str(e)}, 400
+
+        return {'result' : 'success'}, 200
+
+
+        

@@ -3,8 +3,8 @@ from flask_jwt_extended import JWTManager
 from flask_restful import Api
 from config import Config
 from resources.like import LikeResource
-from resources.follow import FollowResoucre
-from resources.posting import PostingResource
+from resources.follow import FollowFmResource, FollowResoucre
+from resources.posting import PostingMainResource, PostingResource
 from resources.user import UserLoginResource, UserRegisterResource, userLogoutResource
 
 
@@ -30,7 +30,9 @@ api.add_resource(  UserRegisterResource , '/user/register')
 api.add_resource(UserLoginResource ,'/user/login' )
 api.add_resource(userLogoutResource , '/user/logout')
 api.add_resource(PostingResource , '/posting')
+api.add_resource(PostingMainResource, '/posting/<int:posting_id>')
 api.add_resource( LikeResource , '/like')
 api.add_resource( FollowResoucre , '/follow')
+api.add_resource( FollowFmResource, '/follow/<int:followee_id>')
 if __name__ == '__main__' :
     app.run()
